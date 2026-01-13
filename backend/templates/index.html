@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}首页 - 物联网环境监测系统{% endblock %}
+
+{% block content %}
+<div id="app">
+    <!-- 仪表盘页面 -->
+    <section id="dashboard" class="page-section">
+        <h2><i class="bi bi-speedometer2"></i> 数据仪表盘</h2>
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-hdd-network"></i> 设备总数</h5>
+                        <h2 class="card-text" id="totalDevices">-</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-check-circle"></i> 在线设备</h5>
+                        <h2 class="card-text" id="onlineDevices">-</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-bell"></i> 待处理报警</h5>
+                        <h2 class="card-text" id="pendingAlerts">-</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-info">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-database"></i> 今日数据点</h5>
+                        <h2 class="card-text" id="todayDataPoints">-</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-thermometer-half"></i> 温度趋势</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="tempChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-droplet"></i> 湿度趋势</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="humidityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-activity"></i> 最新传感器数据</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>设备名称</th>
+                                        <th>温度</th>
+                                        <th>湿度</th>
+                                        <th>PM2.5</th>
+                                        <th>CO2</th>
+                                        <th>时间</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="latestDataTable">
+                                    <tr><td colspan="6" class="text-center">加载中...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 设备管理页面 -->
+    <section id="devices" class="page-section" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-hdd-network"></i> 设备管理</h2>
+            <button class="btn btn-primary" onclick="showAddDeviceModal()">
+                <i class="bi bi-plus-circle"></i> 添加设备
+            </button>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>设备名称</th>
+                                        <th>设备ID</th>
+                                        <th>类型</th>
+                                        <th>位置</th>
+                                        <th>状态</th>
+                                        <th>最后活跃</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="deviceTable">
+                                    <tr><td colspan="7" class="text-center">加载中...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 数据监测页面 -->
+    <section id="monitoring" class="page-section" style="display: none;">
+        <h2><i class="bi bi-graph-up"></i> 数据监测</h2>
+
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>选择设备</h5>
+                    </div>
+                    <div class="card-body">
+                        <select class="form-select" id="monitoringDeviceSelect" onchange="loadMonitoringData()">
+                            <option value="">请选择设备</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>时间范围</h5>
+                    </div>
+                    <div class="card-body">
+                        <select class="form-select" id="timeRangeSelect" onchange="loadMonitoringData()">
+                            <option value="24h">最近24小时</option>
+                            <option value="7d">最近7天</option>
+                            <option value="30d">最近30天</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5>实时数据</h5>
+                        <button class="btn btn-sm btn-outline-primary" onclick="exportData()">
+                            <i class="bi bi-download"></i> 导出数据
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="monitoringChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 报警管理页面 -->
+    <section id="alerts" class="page-section" style="display: none;">
+        <h2><i class="bi bi-bell"></i> 报警管理</h2>
+
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card text-white bg-danger">
+                    <div class="card-body">
+                        <h5 class="card-title">严重</h5>
+                        <h2 id="criticalAlerts">-</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <h5 class="card-title">高</h5>
+                        <h2 id="highAlerts">-</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-info">
+                    <div class="card-body">
+                        <h5 class="card-title">中</h5>
+                        <h2 id="mediumAlerts">-</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-secondary">
+                    <div class="card-body">
+                        <h5 class="card-title">低</h5>
+                        <h2 id="lowAlerts">-</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>报警记录</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>设备</th>
+                                        <th>报警信息</th>
+                                        <th>严重程度</th>
+                                        <th>当前值</th>
+                                        <th>状态</th>
+                                        <th>触发时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="alertTable">
+                                    <tr><td colspan="7" class="text-center">加载中...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

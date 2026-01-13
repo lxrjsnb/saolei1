@@ -1,0 +1,148 @@
+body {
+    font-family: 'Microsoft YaHei', sans-serif;
+    background-color: #f8f9fa;
+}
+
+.page-section {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    font-weight: bold;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.status-online {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-offline {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.status-maintenance {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.severity-critical {
+    background-color: #dc3545;
+    color: white;
+}
+
+.severity-high {
+    background-color: #fd7e14;
+    color: white;
+}
+
+.severity-medium {
+    background-color: #ffc107;
+    color: black;
+}
+
+.severity-low {
+    background-color: #6c757d;
+    color: white;
+}
+
+.alert-pending {
+    background-color: #fff3cd;
+}
+
+.alert-acknowledged {
+    background-color: #d1ecf1;
+}
+
+.alert-resolved {
+    background-color: #d4edda;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+}
+
+.btn-group-sm > .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+/* 设备卡片样式 */
+.device-card {
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.device-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* 传感器数据显示 */
+.sensor-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.sensor-label {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* 实时更新指示器 */
+.live-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #28a745;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+}
