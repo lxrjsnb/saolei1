@@ -2,8 +2,9 @@
   <div class="login-container">
     <div class="login-box">
       <div class="login-header">
-        <el-icon :size="50" color="#409EFF"><Monitor /></el-icon>
+        <el-icon class="login-logo" :size="52"><Monitor /></el-icon>
         <h1>物联网环境监测系统</h1>
+        <p class="subtitle">简约、安全、实时的数据看板</p>
       </div>
 
       <el-form :model="loginForm" :rules="rules" ref="loginFormRef" class="login-form">
@@ -172,19 +173,25 @@ const handleRegister = async () => {
 
 <style scoped>
 .login-container {
-  height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100%;
+  padding: 24px;
+  background:
+    radial-gradient(1100px 600px at 20% 10%, rgba(37, 99, 235, 0.14), transparent 55%),
+    radial-gradient(900px 520px at 85% 25%, rgba(14, 165, 233, 0.12), transparent 60%),
+    linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .login-box {
-  width: 400px;
-  padding: 40px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  width: min(420px, calc(100vw - 32px));
+  padding: 34px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: var(--app-radius);
+  box-shadow: var(--app-shadow);
+  backdrop-filter: blur(12px);
 }
 
 .login-header {
@@ -192,19 +199,46 @@ const handleRegister = async () => {
   margin-bottom: 30px;
 }
 
+.login-logo {
+  color: var(--app-primary);
+}
+
 .login-header h1 {
-  font-size: 24px;
-  color: #333;
-  margin-top: 15px;
+  font-size: 20px;
+  letter-spacing: 0.2px;
+  color: var(--app-text);
+  margin-top: 14px;
+  font-weight: 700;
+}
+
+.subtitle {
+  margin-top: 8px;
+  margin-bottom: 0;
+  color: var(--app-muted);
+  font-size: 13px;
 }
 
 .login-form {
   margin-top: 30px;
 }
 
+.login-form :deep(.el-form-item) {
+  margin-bottom: 16px;
+}
+
+.login-form :deep(.el-input__wrapper) {
+  border-radius: 12px;
+}
+
+.login-form :deep(.el-button) {
+  height: 44px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
 .login-footer {
   text-align: center;
-  color: #999;
+  color: var(--app-muted);
   font-size: 14px;
 }
 </style>

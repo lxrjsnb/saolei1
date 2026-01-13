@@ -272,11 +272,11 @@ onUnmounted(() => {
 
 .stat-card {
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 .stat-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-3px);
 }
 
 .stat-content {
@@ -291,27 +291,27 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 .stat-primary .stat-icon {
-  background-color: #ecf5ff;
-  color: #409EFF;
+  background-color: rgba(37, 99, 235, 0.1);
+  color: var(--app-primary);
 }
 
 .stat-success .stat-icon {
-  background-color: #f0f9ff;
-  color: #67C23A;
+  background-color: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
 }
 
 .stat-warning .stat-icon {
-  background-color: #fdf6ec;
-  color: #E6A23C;
+  background-color: rgba(245, 158, 11, 0.14);
+  color: #b45309;
 }
 
 .stat-info .stat-icon {
-  background-color: #f4f4f5;
-  color: #909399;
+  background-color: rgba(148, 163, 184, 0.16);
+  color: rgba(15, 23, 42, 0.55);
 }
 
 .stat-value {
@@ -321,7 +321,7 @@ onUnmounted(() => {
 }
 
 .stat-label {
-  color: #999;
+  color: var(--app-muted);
   font-size: 14px;
 }
 

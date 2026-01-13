@@ -264,8 +264,7 @@ onMounted(() => {
 }
 
 .stats-row {
-  display: flex;
-  gap: 20px;
+  margin-bottom: 0;
 }
 
 .stat-card {
@@ -289,7 +288,7 @@ onMounted(() => {
 }
 
 .stat-label {
-  color: #999;
+  color: var(--app-muted);
   font-size: 14px;
 }
 
@@ -321,6 +320,6 @@ onMounted(() => {
 }
 
 .text-gray {
-  color: #999;
+  color: var(--app-muted);
 }
 </style>

@@ -1,17 +1,15 @@
 <template>
   <el-container class="layout-container">
     <!-- 侧边栏 -->
-    <el-aside width="200px">
+    <el-aside width="220px" class="app-aside">
       <div class="logo">
         <el-icon :size="30"><Monitor /></el-icon>
         <span>环境监测</span>
       </div>
       <el-menu
+        class="app-menu"
         :default-active="activeMenu"
         router
-        background-color="#304156"
-        text-color="#bfcbd9"
-        active-text-color="#409EFF"
       >
         <el-menu-item index="/dashboard">
           <el-icon><Odometer /></el-icon>
@@ -63,8 +61,10 @@
       </el-header>
 
       <!-- 页面内容 -->
-      <el-main>
-        <RouterView />
+      <el-main class="app-main">
+        <div class="page-shell">
+          <RouterView />
+        </div>
       </el-main>
     </el-container>
   </el-container>
@@ -114,9 +114,10 @@ const handleLogout = async () => {
   height: 100%;
 }
 
-.el-aside {
-  background-color: #304156;
-  color: #fff;
+.app-aside {
+  background: var(--app-surface);
+  border-right: 1px solid var(--app-border);
+  color: var(--app-text);
 }
 
 .logo {
@@ -126,18 +127,29 @@ const handleLogout = async () => {
   justify-content: center;
   font-size: 18px;
   font-weight: bold;
-  color: #fff;
+  color: var(--app-text);
   gap: 10px;
-  background-color: #2b3a4a;
+  border-bottom: 1px solid var(--app-border);
 }
 
-.el-menu {
+.app-menu {
   border-right: none;
 }
 
+.app-menu :deep(.el-menu-item),
+.app-menu :deep(.el-sub-menu__title) {
+  color: rgba(15, 23, 42, 0.8);
+}
+
+.app-menu :deep(.el-menu-item.is-active) {
+  color: var(--app-primary);
+  background: rgba(37, 99, 235, 0.08);
+}
+
 .el-header {
-  background-color: #fff;
-  border-bottom: 1px solid #e6e6e6;
+  background: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid var(--app-border);
+  backdrop-filter: saturate(180%) blur(10px);
   display: flex;
   align-items: center;
   padding: 0 20px;
@@ -158,8 +170,13 @@ const handleLogout = async () => {
   font-size: 14px;
 }
 
-.el-main {
-  background-color: #f0f2f5;
+.app-main {
+  background: var(--app-bg);
   padding: 20px;
+}
+
+.page-shell {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 </style>
