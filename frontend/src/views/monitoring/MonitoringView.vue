@@ -151,13 +151,15 @@ const formatDateTime = (dateString) => {
 
 const loadDevices = async () => {
   try {
-    devices.value = await getDevices()
+    const response = await getDevices()
+    devices.value = response.results || response
     if (devices.value.length > 0) {
       selectedDevice.value = devices.value[0].id
       loadData()
     }
   } catch (error) {
-    ElMessage.error('加载设备列表失败')
+    console.error('加载设备列表失败:', error)
+    ElMessage.error(error?.response?.data?.error || error?.message || '加载设备列表失败')
   }
 }
 
@@ -177,7 +179,8 @@ const loadData = async () => {
     // 更新图表
     updateChart(tableData.value)
   } catch (error) {
-    ElMessage.error('加载数据失败')
+    console.error('加载数据失败:', error)
+    ElMessage.error(error?.response?.data?.error || error?.message || '加载数据失败')
   } finally {
     loading.value = false
   }

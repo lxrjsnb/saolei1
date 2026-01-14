@@ -38,7 +38,7 @@ class SensorDataViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False, methods=['get'])
     def latest(self, request):
         """获取所有设备的最新数据"""
-        devices = Device.objects.filter(owner=request.user, status='online')
+        devices = Device.objects.filter(owner=request.user)
         result = []
 
         for device in devices:
@@ -49,6 +49,7 @@ class SensorDataViewSet(viewsets.ReadOnlyModelViewSet):
                     'device_name': device.name,
                     'device_type': device.device_type,
                     'location': device.location,
+                    'status': device.status,
                     'temperature': latest.temperature,
                     'humidity': latest.humidity,
                     'light_intensity': latest.light_intensity,

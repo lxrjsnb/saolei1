@@ -137,9 +137,11 @@ const formatDateTime = (dateString) => {
 const loadDevices = async () => {
   loading.value = true
   try {
-    devices.value = await getDevices()
+    const response = await getDevices()
+    devices.value = response.results || response
   } catch (error) {
-    ElMessage.error('加载设备列表失败')
+    console.error('加载设备列表失败:', error)
+    ElMessage.error(error?.response?.data?.error || error?.message || '加载设备列表失败')
   } finally {
     loading.value = false
   }

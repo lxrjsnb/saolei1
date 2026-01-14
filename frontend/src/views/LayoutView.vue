@@ -27,6 +27,10 @@
           <el-icon><Bell /></el-icon>
           <span>报警管理</span>
         </el-menu-item>
+        <el-menu-item index="/bigscreen">
+          <el-icon><DataBoard /></el-icon>
+          <span>数据大屏</span>
+        </el-menu-item>
       </el-menu>
     </el-aside>
 
@@ -75,7 +79,7 @@ import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import {
-  Monitor, Odometer, Cpu, TrendCharts, Bell, User, SwitchButton
+  Monitor, Odometer, Cpu, TrendCharts, Bell, DataBoard, User, SwitchButton
 } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 
@@ -90,7 +94,8 @@ const currentPageName = computed(() => {
     '/dashboard': '仪表盘',
     '/devices': '设备管理',
     '/monitoring': '数据监测',
-    '/alerts': '报警管理'
+    '/alerts': '报警管理',
+    '/bigscreen': '数据大屏'
   }
   return names[route.path] || '首页'
 })

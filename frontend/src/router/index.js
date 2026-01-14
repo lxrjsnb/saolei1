@@ -9,6 +9,12 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
+    path: '/bigscreen',
+    name: 'BigScreen',
+    component: () => import('@/views/bigscreen/BigScreenView.vue'),
+    meta: { requiresAuth: false, fullscreen: true }
+  },
+  {
     path: '/',
     component: () => import('@/views/LayoutView.vue'),
     meta: { requiresAuth: true },

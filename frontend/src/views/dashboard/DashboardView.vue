@@ -154,7 +154,8 @@ const formatDateTime = (dateString) => {
 const loadStats = async () => {
   try {
     // 加载设备统计
-    const devices = await getDevices()
+    const devicesResponse = await getDevices()
+    const devices = devicesResponse.results || devicesResponse
     stats.totalDevices = devices.length
     stats.onlineDevices = devices.filter(d => d.status === 'online').length
 
@@ -170,7 +171,8 @@ const loadStats = async () => {
     // 更新图表
     updateCharts(data)
   } catch (error) {
-    ElMessage.error('加载数据失败')
+    console.error('加载统计数据失败:', error)
+    ElMessage.error(error?.response?.data?.error || error?.message || '加载数据失败')
   }
 }
 

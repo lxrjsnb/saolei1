@@ -174,9 +174,24 @@ class AlertStatisticsView(APIView):
         for severity in ['low', 'medium', 'high', 'critical']:
             severity_stats[severity] = queryset.filter(severity=severity).count()
 
+        # 获取最近的报警记录
+        recent_alerts = queryset.order_by('-triggered_at')[:10]
+        recent_alerts_data = []
+        for alert in recent_alerts:
+            recent_alerts_data.append({
+                'id': alert.id,
+                'message': alert.message,
+                'severity': alert.severity,
+                'device_name': alert.device.name,
+                'current_value': alert.current_value,
+                'status': alert.status,
+                'triggered_at': alert.triggered_at.isoformat()
+            })
+
         return Response({
             'time_range': time_range,
             'total_stats': total_stats,
             'device_stats': list(device_stats),
-            'severity_stats': severity_stats
+            'severity_stats': severity_stats,
+            'recent_alerts': recent_alerts_data
         })
