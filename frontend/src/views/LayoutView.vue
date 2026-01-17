@@ -3,8 +3,8 @@
     <!-- 侧边栏 -->
     <el-aside width="220px" class="app-aside">
       <div class="logo">
-        <el-icon :size="30"><Monitor /></el-icon>
-        <span>环境监测</span>
+        <el-icon :size="30"><Cpu /></el-icon>
+        <span>机器人技术管理平台</span>
       </div>
       <el-menu
         class="app-menu"
@@ -13,23 +13,19 @@
       >
         <el-menu-item index="/dashboard">
           <el-icon><Odometer /></el-icon>
-          <span>仪表盘</span>
+          <span>平台概览</span>
         </el-menu-item>
         <el-menu-item index="/devices">
           <el-icon><Cpu /></el-icon>
-          <span>设备管理</span>
+          <span>机器人状态</span>
         </el-menu-item>
         <el-menu-item index="/monitoring">
           <el-icon><TrendCharts /></el-icon>
-          <span>数据监测</span>
+          <span>运行监控</span>
         </el-menu-item>
         <el-menu-item index="/alerts">
           <el-icon><Bell /></el-icon>
-          <span>报警管理</span>
-        </el-menu-item>
-        <el-menu-item index="/bigscreen">
-          <el-icon><DataBoard /></el-icon>
-          <span>数据大屏</span>
+          <span>可视化BI</span>
         </el-menu-item>
       </el-menu>
     </el-aside>
@@ -79,7 +75,7 @@ import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import {
-  Monitor, Odometer, Cpu, TrendCharts, Bell, DataBoard, User, SwitchButton
+  Odometer, Cpu, TrendCharts, Bell, User, SwitchButton
 } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 
@@ -91,11 +87,10 @@ const activeMenu = computed(() => route.path)
 
 const currentPageName = computed(() => {
   const names = {
-    '/dashboard': '仪表盘',
-    '/devices': '设备管理',
-    '/monitoring': '数据监测',
-    '/alerts': '报警管理',
-    '/bigscreen': '数据大屏'
+    '/dashboard': '平台概览',
+    '/devices': '机器人状态',
+    '/monitoring': '运行监控',
+    '/alerts': '可视化BI'
   }
   return names[route.path] || '首页'
 })

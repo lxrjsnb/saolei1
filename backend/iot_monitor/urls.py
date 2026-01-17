@@ -19,6 +19,7 @@ urlpatterns = [
     path("api/monitoring/", include("monitoring.urls")),
     path("api/alerts/", include("alerts.urls")),
     path("api/auth/", include("users.urls")),
+    path("api/robots/", include("robots.urls")),
 ]
 
 # 开发环境下提供静态文件服务

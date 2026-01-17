@@ -9,8 +9,8 @@
               <el-icon :size="40"><Cpu /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-value">{{ stats.totalDevices }}</div>
-              <div class="stat-label">设备总数</div>
+              <div class="stat-value">{{ stats.total }}</div>
+              <div class="stat-label">部件总数</div>
             </div>
           </div>
         </el-card>
@@ -22,8 +22,8 @@
               <el-icon :size="40"><CircleCheck /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-value">{{ stats.onlineDevices }}</div>
-              <div class="stat-label">在线设备</div>
+              <div class="stat-value">{{ stats.highRisk }}</div>
+              <div class="stat-label">高风险（Level H）</div>
             </div>
           </div>
         </el-card>
@@ -35,8 +35,8 @@
               <el-icon :size="40"><Bell /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-value">{{ stats.pendingAlerts }}</div>
-              <div class="stat-label">待处理报警</div>
+              <div class="stat-value">{{ stats.historyHighRisk }}</div>
+              <div class="stat-label">历史高风险（有记录）</div>
             </div>
           </div>
         </el-card>
@@ -48,8 +48,8 @@
               <el-icon :size="40"><DataLine /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-value">{{ stats.todayDataPoints }}</div>
-              <div class="stat-label">今日数据点</div>
+              <div class="stat-value">{{ stats.marked }}</div>
+              <div class="stat-label">已标记（mark≠0）</div>
             </div>
           </div>
         </el-card>
@@ -61,7 +61,7 @@
       <el-col :span="12">
         <el-card>
           <template #header>
-            <span>温度趋势</span>
+            <span>近24小时风险事件</span>
           </template>
           <div ref="tempChartRef" style="height: 300px"></div>
         </el-card>
@@ -69,7 +69,7 @@
       <el-col :span="12">
         <el-card>
           <template #header>
-            <span>湿度趋势</span>
+            <span>A1-A7 异常分布</span>
           </template>
           <div ref="humidityChartRef" style="height: 300px"></div>
         </el-card>
@@ -77,39 +77,34 @@
     </el-row>
 
     <!-- 最新数据表格 -->
-    <el-row class="data-row">
-      <el-col :span="24">
+    <el-row :gutter="20" class="data-row">
+      <el-col :span="12">
         <el-card>
           <template #header>
-            <span>最新传感器数据</span>
+            <span>组别明细</span>
           </template>
-          <el-table :data="latestData" stripe v-loading="loading">
-            <el-table-column prop="device_name" label="设备名称" />
-            <el-table-column label="温度">
-              <template #default="{ row }">
-                {{ formatValue(row.temperature, '℃') }}
-              </template>
-            </el-table-column>
-            <el-table-column label="湿度">
-              <template #default="{ row }">
-                {{ formatValue(row.humidity, '%') }}
-              </template>
-            </el-table-column>
-            <el-table-column label="PM2.5">
-              <template #default="{ row }">
-                {{ formatValue(row.pm25, 'μg/m³') }}
-              </template>
-            </el-table-column>
-            <el-table-column label="CO2">
-              <template #default="{ row }">
-                {{ formatValue(row.co2, 'ppm') }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="timestamp" label="采集时间" width="180">
-              <template #default="{ row }">
-                {{ formatDateTime(row.timestamp) }}
-              </template>
-            </el-table-column>
+          <el-table :data="groupRows" stripe v-loading="loading" height="360">
+            <el-table-column prop="name" label="Plant" width="140" />
+            <el-table-column prop="expected_total" label="预期" width="90" />
+            <el-table-column prop="total" label="当前" width="90" />
+            <el-table-column prop="highRisk" label="高风险(H)" width="110" />
+            <el-table-column prop="historyHighRisk" label="历史高风险" width="120" />
+            <el-table-column prop="marked" label="标记" width="90" />
+          </el-table>
+        </el-card>
+      </el-col>
+      <el-col :span="12">
+        <el-card>
+          <template #header>
+            <span>最近更新部件</span>
+          </template>
+          <el-table :data="recentRows" stripe v-loading="loading" height="360">
+            <el-table-column prop="partNo" label="Robot" width="190" show-overflow-tooltip />
+            <el-table-column prop="referenceNo" label="Reference" width="170" />
+            <el-table-column prop="number" label="Number" width="100" />
+            <el-table-column prop="typeSpec" label="Type" min-width="160" show-overflow-tooltip />
+            <el-table-column prop="level" label="Level" width="90" />
+            <el-table-column prop="mark" label="Mark" width="90" />
           </el-table>
         </el-card>
       </el-col>
@@ -121,30 +116,26 @@
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import * as echarts from 'echarts'
-import { getDevices } from '@/api/devices'
-import { getLatestData } from '@/api/monitoring'
-import { getAlertStatistics } from '@/api/alerts'
+import { DEMO_MODE } from '@/config/appConfig'
+import { getRobotsDashboard } from '@/api/robots'
+import { createRiskEvents, getAllRobots } from '@/mock/robots'
 
 const loading = ref(false)
-const latestData = ref([])
 const tempChartRef = ref(null)
 const humidityChartRef = ref(null)
+const groupRows = ref([])
+const recentRows = ref([])
 
 let tempChart = null
 let humidityChart = null
 let refreshTimer = null
 
 const stats = reactive({
-  totalDevices: 0,
-  onlineDevices: 0,
-  pendingAlerts: 0,
-  todayDataPoints: 0
+  total: 0,
+  highRisk: 0,
+  historyHighRisk: 0,
+  marked: 0
 })
-
-const formatValue = (value, unit = '') => {
-  if (value === null || value === undefined) return '-'
-  return `${value.toFixed(1)} ${unit}`
-}
 
 const formatDateTime = (dateString) => {
   if (!dateString) return '-'
@@ -152,46 +143,64 @@ const formatDateTime = (dateString) => {
 }
 
 const loadStats = async () => {
+  loading.value = true
   try {
-    // 加载设备统计
-    const devicesResponse = await getDevices()
-    const devices = devicesResponse.results || devicesResponse
-    stats.totalDevices = devices.length
-    stats.onlineDevices = devices.filter(d => d.status === 'online').length
+    if (DEMO_MODE) {
+      const robots = getAllRobots()
+      stats.total = robots.length
+      stats.highRisk = robots.filter((r) => r.level === 'H').length
+      stats.historyHighRisk = robots.filter((r) => r.riskHistory?.length).length
+      stats.marked = robots.filter((r) => (r.mark ?? 0) !== 0).length
 
-    // 加载报警统计
-    const alertStats = await getAlertStatistics('24h')
-    stats.pendingAlerts = alertStats.total_stats?.pending || 0
+      groupRows.value = []
+      recentRows.value = robots.slice(0, 18).map((r) => ({
+        partNo: r.partNo,
+        referenceNo: r.referenceNo,
+        number: r.number ?? 0,
+        typeSpec: r.typeSpec,
+        level: r.level,
+        mark: r.mark ?? 0
+      }))
 
-    // 加载最新数据
-    const data = await getLatestData()
-    latestData.value = data
-    stats.todayDataPoints = data.length
+      const axisBad = {}
+      for (const axis of ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7']) {
+        axisBad[axis] = robots.filter((r) => r.checks?.[axis]?.ok === false).length
+      }
+      const events = createRiskEvents(120)
+      updateCharts({ axisBad, events24h: events })
+      return
+    }
 
-    // 更新图表
+    const data = await getRobotsDashboard()
+    stats.total = data.summary?.total ?? 0
+    stats.highRisk = data.summary?.highRisk ?? 0
+    stats.historyHighRisk = data.summary?.historyHighRisk ?? 0
+    stats.marked = data.summary?.marked ?? 0
+
+    groupRows.value = data.groupStats || []
+    recentRows.value = (data.recentUpdated || []).slice(0, 18)
+
     updateCharts(data)
   } catch (error) {
     console.error('加载统计数据失败:', error)
     ElMessage.error(error?.response?.data?.error || error?.message || '加载数据失败')
+  } finally {
+    loading.value = false
   }
 }
 
-const updateCharts = (data) => {
-  if (!data || data.length === 0) return
+const updateCharts = (dashboard) => {
+  // 近24小时风险事件（折线）
+  const events24h = dashboard.events24h || []
+  const timeLabels = events24h.map((item) =>
+    new Date(item.time || item.triggered_at).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+  )
+  const counts = events24h.map((item) => item.count ?? 1)
 
-  const labels = data.map(item => {
-    const date = new Date(item.timestamp)
-    return date.toLocaleTimeString('zh-CN')
-  })
-
-  const tempData = data.map(item => item.temperature)
-  const humidityData = data.map(item => item.humidity)
-
-  // 温度图表
   if (tempChart) {
     tempChart.setOption({
-      xAxis: { data: labels },
-      series: [{ data: tempData }]
+      xAxis: { data: timeLabels },
+      series: [{ data: counts }]
     })
   } else if (tempChartRef.value) {
     tempChart = echarts.init(tempChartRef.value)
@@ -200,46 +209,49 @@ const updateCharts = (data) => {
       tooltip: { trigger: 'axis' },
       xAxis: {
         type: 'category',
-        data: labels,
+        data: timeLabels,
         axisLabel: { rotate: 45 }
       },
-      yAxis: { type: 'value' },
+      yAxis: { type: 'value', min: 0 },
       series: [{
-        name: '温度',
+        name: '事件数',
         type: 'line',
-        data: tempData,
+        data: counts,
         smooth: true,
         itemStyle: { color: '#409EFF' }
       }]
     })
   }
 
-  // 湿度图表
+  // A1-A7 异常分布（柱状）
+  const axisBad = dashboard.axisBad || {}
+  const axisKeys = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7']
+  const axisCounts = axisKeys.map((k) => axisBad[k] ?? 0)
+
   if (humidityChart) {
     humidityChart.setOption({
-      xAxis: { data: labels },
-      series: [{ data: humidityData }]
+      xAxis: { data: axisKeys },
+      series: [{ data: axisCounts }]
     })
   } else if (humidityChartRef.value) {
     humidityChart = echarts.init(humidityChartRef.value)
     humidityChart.setOption({
       title: { text: '' },
-      tooltip: { trigger: 'axis' },
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
       xAxis: {
         type: 'category',
-        data: labels,
-        axisLabel: { rotate: 45 }
+        data: axisKeys
       },
       yAxis: {
         type: 'value',
-        max: 100
+        minInterval: 1
       },
       series: [{
-        name: '湿度',
-        type: 'line',
-        data: humidityData,
-        smooth: true,
-        itemStyle: { color: '#67C23A' }
+        name: '异常数量',
+        type: 'bar',
+        data: axisCounts,
+        itemStyle: { color: '#E6A23C' },
+        barWidth: '60%'
       }]
     })
   }

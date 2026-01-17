@@ -1,14 +1,5 @@
 import request from '@/utils/request'
 
-// 用户注册
-export function register(username, password, email) {
-  return request({
-    url: '/auth/register/',
-    method: 'post',
-    data: { username, password, email }
-  })
-}
-
 // 用户登录
 export function login(username, password) {
   return request({

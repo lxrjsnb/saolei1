@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import { DEMO_MODE } from '@/config/appConfig'
 
 const routes = [
   {
@@ -7,12 +8,6 @@ const routes = [
     name: 'Login',
     component: () => import('@/views/auth/LoginView.vue'),
     meta: { requiresAuth: false }
-  },
-  {
-    path: '/bigscreen',
-    name: 'BigScreen',
-    component: () => import('@/views/bigscreen/BigScreenView.vue'),
-    meta: { requiresAuth: false, fullscreen: true }
   },
   {
     path: '/',
@@ -54,6 +49,11 @@ const router = createRouter({
 
 // 路由守卫
 router.beforeEach((to, from, next) => {
+  if (DEMO_MODE) {
+    next()
+    return
+  }
+
   const userStore = useUserStore()
   const isAuthenticated = userStore.isAuthenticated
 

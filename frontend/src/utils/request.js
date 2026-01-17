@@ -41,7 +41,11 @@ request.interceptors.response.use(
           ElMessage.error('没有权限访问')
           break
         case 404:
-          ElMessage.error('请求的资源不存在')
+          if (typeof error.response.data?.detail === 'string' && error.response.data.detail.includes('Invalid page')) {
+            ElMessage.warning('页码超出范围，已重置')
+          } else {
+            ElMessage.error('请求的资源不存在')
+          }
           break
         case 500:
           ElMessage.error('服务器错误')

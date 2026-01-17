@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
 import { login, logout, getUserInfo } from '@/api/auth'
+import { DEMO_MODE } from '@/config/appConfig'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
     token: localStorage.getItem('token') || '',
     userInfo: null,
-    username: localStorage.getItem('username') || ''
+    username: localStorage.getItem('username') || (DEMO_MODE ? '管理员' : '')
   }),
 
   getters: {
@@ -28,6 +29,12 @@ export const useUserStore = defineStore('user', {
     },
 
     async login(username, password) {
+      if (DEMO_MODE) {
+        this.setToken('demo-token')
+        this.setUsername(username || '管理员')
+        return { token: 'demo-token', username: username || '管理员' }
+      }
+
       try {
         const data = await login(username, password)
         this.setToken(data.token)
@@ -40,7 +47,9 @@ export const useUserStore = defineStore('user', {
 
     async logout() {
       try {
-        await logout()
+        if (!DEMO_MODE) {
+          await logout()
+        }
       } catch (error) {
         console.error('退出登录失败:', error)
       } finally {

@@ -2,9 +2,9 @@
   <div class="login-container">
     <div class="login-box">
       <div class="login-header">
-        <el-icon class="login-logo" :size="52"><Monitor /></el-icon>
-        <h1>物联网环境监测系统</h1>
-        <p class="subtitle">简约、安全、实时的数据看板</p>
+        <el-icon class="login-logo" :size="52"><Cpu /></el-icon>
+        <h1>机器人技术管理平台</h1>
+        <p class="subtitle">状态可视化 · 风险闭环 · 轻量演示</p>
       </div>
 
       <el-form :model="loginForm" :rules="rules" ref="loginFormRef" class="login-form">
@@ -39,35 +39,8 @@
             登录
           </el-button>
         </el-form-item>
-
-        <div class="login-footer">
-          <span>还没有账号？</span>
-          <el-link type="primary" @click="showRegister = true">立即注册</el-link>
-        </div>
       </el-form>
     </div>
-
-    <!-- 注册对话框 -->
-    <el-dialog v-model="showRegister" title="用户注册" width="400px">
-      <el-form :model="registerForm" :rules="registerRules" ref="registerFormRef">
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="registerForm.username" placeholder="请输入用户名" />
-        </el-form-item>
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="registerForm.email" placeholder="请输入邮箱" />
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="registerForm.password" type="password" placeholder="请输入密码" />
-        </el-form-item>
-        <el-form-item label="确认密码" prop="confirmPassword">
-          <el-input v-model="registerForm.confirmPassword" type="password" placeholder="请再次输入密码" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="showRegister = false">取消</el-button>
-        <el-button type="primary" :loading="loading" @click="handleRegister">注册</el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
@@ -75,28 +48,18 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { User, Lock, Monitor } from '@element-plus/icons-vue'
+import { User, Lock, Cpu } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
-import { register } from '@/api/auth'
 
 const router = useRouter()
 const userStore = useUserStore()
 
 const loginFormRef = ref(null)
-const registerFormRef = ref(null)
 const loading = ref(false)
-const showRegister = ref(false)
 
 const loginForm = reactive({
   username: '',
   password: ''
-})
-
-const registerForm = reactive({
-  username: '',
-  email: '',
-  password: '',
-  confirmPassword: ''
 })
 
 const rules = {
@@ -105,34 +68,6 @@ const rules = {
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' }
-  ]
-}
-
-const registerRules = {
-  username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 3, max: 20, message: '用户名长度在3到20个字符', trigger: 'blur' }
-  ],
-  email: [
-    { required: true, message: '请输入邮箱', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
-  ],
-  password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, message: '密码长度不能少于6个字符', trigger: 'blur' }
-  ],
-  confirmPassword: [
-    { required: true, message: '请再次输入密码', trigger: 'blur' },
-    {
-      validator: (rule, value, callback) => {
-        if (value !== registerForm.password) {
-          callback(new Error('两次输入的密码不一致'))
-        } else {
-          callback()
-        }
-      },
-      trigger: 'blur'
-    }
   ]
 }
 
@@ -147,24 +82,6 @@ const handleLogin = async () => {
     router.push('/dashboard')
   } catch (error) {
     ElMessage.error(error.message || '登录失败')
-  } finally {
-    loading.value = false
-  }
-}
-
-const handleRegister = async () => {
-  const valid = await registerFormRef.value.validate().catch(() => false)
-  if (!valid) return
-
-  loading.value = true
-  try {
-    await register(registerForm.username, registerForm.password, registerForm.email)
-    ElMessage.success('注册成功，请登录')
-    showRegister.value = false
-    // 自动填充登录表单
-    loginForm.username = registerForm.username
-  } catch (error) {
-    ElMessage.error(error.message || '注册失败')
   } finally {
     loading.value = false
   }
@@ -234,11 +151,5 @@ const handleRegister = async () => {
   height: 44px;
   border-radius: 12px;
   font-weight: 600;
-}
-
-.login-footer {
-  text-align: center;
-  color: var(--app-muted);
-  font-size: 14px;
 }
 </style>
